@@ -8,7 +8,6 @@ import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 import '@/styles/index.scss' // global css
-
 import App from './App'
 import router from './router'
 import store from './store'

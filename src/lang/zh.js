@@ -1,6 +1,8 @@
 export default {
   route: {
     dashboard: '首页',
+    admin: '管理员管理',
+    adminList: '管理员列表',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',
@@ -75,6 +77,9 @@ export default {
     title: '系统登录',
     logIn: '登录',
     username: '账号',
+    loginName: '账号',
+    checkLoginName: '账号不能少于5位',
+    checkPassword: '密码不能少于6位',
     password: '密码',
     any: '随便填',
     thirdparty: '第三方登录',
