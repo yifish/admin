@@ -79,7 +79,7 @@ export const asyncRouterMap = [
     },
     children: [
       {
-        path: 'index',
+        path: 'admin/index',
         component: () => import('@/views/admin/index'),
         name: 'AdminList',
         meta: {
