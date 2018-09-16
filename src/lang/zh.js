@@ -126,11 +126,18 @@ export default {
     status: '状态',
     actions: '操作',
     edit: '编辑',
+    create: '创建',
     publish: '发布',
     draft: '草稿',
     delete: '删除',
     cancel: '取 消',
-    confirm: '确 定'
+    confirm: '确 定',
+    name: '名 称',
+    role: '角 色',
+    loginName: '登陆账号',
+    loginTime: '最后一次登陆时间',
+    roleName: '角色名称',
+    created_at: '添加时间'
   },
   errorLog: {
     tips: '请点击右上角bug小图标',
