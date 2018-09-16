@@ -12,6 +12,7 @@ const admin = {
     avatar: avatar,
     introduction: '',
     menu: [],
+    competence: [],
     setting: {
       articlePlatform: []
     }
@@ -41,6 +42,9 @@ const admin = {
     },
     SET_MENU: (state, menu) => {
       state.menu = menu
+    },
+    SET_COMPETENCE: (state, competence) => {
+      state.competence = competence
     }
   },
 
@@ -66,6 +70,7 @@ const admin = {
           const data = response.data
           if (data.menu && data.menu.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_MENU', data.menu)
+            commit('SET_COMPETENCE', data.competence)
           } else {
             reject('GetAdminInfo: menu must be a non-null array !')
           }

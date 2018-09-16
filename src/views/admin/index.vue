@@ -1,5 +1,10 @@
 <template>
   <div class="app-container">
+
+    <div class="filter-container">
+      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.adminAdd') }}</el-button>
+    </div>
+
     <el-table v-loading="listLoading" :data="list" row-key="adminId" border fit highlight-current-row style="width: 100%">
 
       <el-table-column align="center" label="ID" width="65">
@@ -48,11 +53,17 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+        <el-form-item v-if="dialogStatus=='create'" :label="$t('table.loginName')" prop="loginName">
+          <el-input v-model="temp.loginName"/>
+        </el-form-item>
         <el-form-item :label="$t('table.name')" prop="name">
           <el-input v-model="temp.name"/>
         </el-form-item>
+        <el-form-item v-if="dialogStatus=='create'" :label="$t('table.password')" prop="password">
+          <el-input v-model="temp.password"/>
+        </el-form-item>
         <el-form-item :label="$t('table.role')" prop="type">
-          <el-select v-model="temp.roleId" class="filter-item" placeholder="Please select">
+          <el-select :placeholder="$t('table.pleaseSelect')" v-model="temp.roleId" class="filter-item">
             <el-option v-for="role in roleList" :key="role.key" :label="role.name" :value="role.roleId"/>
           </el-select>
         </el-form-item>
@@ -68,7 +79,7 @@
 </template>
 
 <script>
-// import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import { adminList, adminRoleAll, adminUpdate } from '@/api/admin'
 
 export default {
@@ -89,7 +100,10 @@ export default {
       roleList: [],
       temp: {
         adminId: undefined,
-        name: ''
+        name: '',
+        roleId: undefined,
+        loginName: undefined,
+        password: undefined
       },
       textMap: {
         update: this.$t('table.edit'),
@@ -100,6 +114,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters([
+      'competence'
+    ])
   },
   created() {
     this.getList()
@@ -118,6 +135,13 @@ export default {
         this.newList = this.oldList.slice()
       })
     },
+    handleCreate() { // 添加管理员
+      this.dialogStatus = 'create'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
     handleUpdate(row) {
       this.temp = Object.assign({}, row)
       this.dialogStatus = 'update'
@@ -125,7 +149,6 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
-      // console.log(row)
     },
     getRoleAll() {
       adminRoleAll({}).then(response => {
@@ -133,7 +156,7 @@ export default {
         this.roleList = response.data
       })
     },
-    updateData() {
+    updateData() { // 修改管理员信息
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           // console.log(this.temp)
@@ -157,6 +180,9 @@ export default {
           })
         }
       })
+    },
+    createData() {
+      console.log(1)
     }
   }
 }
