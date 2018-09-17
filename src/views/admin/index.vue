@@ -2,7 +2,7 @@
   <div class="app-container">
 
     <div class="filter-container">
-      <el-button class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.adminAdd') }}</el-button>
+      <el-button v-if="showCreate" class="filter-item" type="primary" icon="el-icon-edit" @click="handleCreate">{{ $t('table.adminAdd') }}</el-button>
     </div>
 
     <el-table v-loading="listLoading" :data="list" row-key="adminId" border fit highlight-current-row style="width: 100%">
@@ -90,6 +90,7 @@ export default {
       list: null,
       total: null,
       listLoading: true,
+      showCreate: false,
       listQuery: {
         page: 1,
         limit: 10
@@ -122,6 +123,8 @@ export default {
     this.getList()
     // 获取所有角色列表
     this.getRoleAll()
+    // 初始化权限
+    this.showCompetence()
   },
   methods: {
     getList() {
@@ -183,6 +186,12 @@ export default {
     },
     createData() {
       console.log(1)
+    },
+    showCompetence() {
+      // console.log(this.competence)
+      if (this.competence.indexOf('adminCreate') > 0) {
+        this.showCreate = true
+      }
     }
   }
 }
