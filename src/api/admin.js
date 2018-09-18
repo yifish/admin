@@ -23,3 +23,11 @@ export function adminUpdate(query) {
     params: query
   })
 }
+
+export function adminCreate(query) {
+  return request({
+    url: '/admin/adminCreate',
+    method: 'post',
+    params: query
+  })
+}

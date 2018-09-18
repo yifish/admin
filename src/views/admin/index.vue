@@ -45,7 +45,7 @@
 
       <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="showUpdate" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
         </template>
       </el-table-column>
 
@@ -80,7 +80,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { adminList, adminRoleAll, adminUpdate } from '@/api/admin'
+import { adminList, adminRoleAll, adminUpdate, adminCreate } from '@/api/admin'
 
 export default {
   name: 'AdminList',
@@ -91,6 +91,7 @@ export default {
       total: null,
       listLoading: true,
       showCreate: false,
+      showUpdate: false,
       listQuery: {
         page: 1,
         limit: 10
@@ -139,11 +140,18 @@ export default {
       })
     },
     handleCreate() { // 添加管理员
+      this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate()
       })
+    },
+    resetTemp() {
+      this.temp.name = ''
+      this.temp.roleId = undefined
+      this.temp.loginName = undefined
+      this.temp.password = undefined
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row)
@@ -166,31 +174,55 @@ export default {
           const tempData = Object.assign({}, this.temp)
           adminUpdate(tempData).then(response => {
             // console.log(response)
-            for (const v of this.list) {
-              if (v.adminId === this.temp.adminId) {
-                const index = this.list.indexOf(v)
-                this.list.splice(index, 1, this.temp)
-                break
+            if (response) {
+              for (const v of this.list) {
+                if (v.adminId === this.temp.adminId) {
+                  const index = this.list.indexOf(v)
+                  const tempData = Object.assign({}, this.temp)
+                  this.list.splice(index, 1, tempData)
+                  break
+                }
               }
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
             }
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '成功',
-              message: '更新成功',
-              type: 'success',
-              duration: 2000
-            })
           })
         }
       })
     },
     createData() {
-      console.log(1)
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          // console.log(this.temp)
+          const tempData = Object.assign({}, this.temp)
+          adminCreate(tempData).then(response => {
+            if (response) {
+              this.resetTemp()
+              this.dialogFormVisible = false
+              this.getList()
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success',
+                duration: 2000
+              })
+            }
+          })
+        }
+      })
     },
     showCompetence() {
       // console.log(this.competence)
       if (this.competence.indexOf('adminCreate') > 0) {
         this.showCreate = true
+      }
+      if (this.competence.indexOf('adminUpdate') > 0) {
+        this.showUpdate = true
       }
     }
   }
