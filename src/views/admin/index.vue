@@ -53,6 +53,10 @@
 
     </el-table>
 
+    <div class="pagination-container">
+      <el-pagination :current-page="listQuery.page" :page-sizes="listQuery.limit" :page-size="listQuery.limit" :total="total" background layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange" @current-change="handleCurrentChange"/>
+    </div>
+
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item v-if="dialogStatus=='create'" :label="$t('table.loginName')" prop="loginName">
@@ -141,6 +145,18 @@ export default {
         this.oldList = this.list.map(v => v.adminId)
         this.newList = this.oldList.slice()
       })
+    },
+    handleFilter() {
+      this.listQuery.page = 1
+      this.getList()
+    },
+    handleSizeChange(val) {
+      this.listQuery.limit = val
+      this.getList()
+    },
+    handleCurrentChange(val) {
+      this.listQuery.page = val
+      this.getList()
     },
     handleCreate() { // 添加管理员
       this.resetTemp()
