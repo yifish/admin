@@ -46,6 +46,8 @@
       <el-table-column :label="$t('table.actions')" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button v-if="showUpdate" type="primary" size="mini" @click="handleUpdate(scope.row)">{{ $t('table.edit') }}</el-button>
+          <el-button v-if="showDelete" size="mini" type="danger" @click="handleDelete(scope.row)">{{ $t('table.delete') }}
+          </el-button>
         </template>
       </el-table-column>
 
@@ -80,7 +82,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { adminList, adminRoleAll, adminUpdate, adminCreate } from '@/api/admin'
+import { adminList, adminRoleAll, adminUpdate, adminCreate, adminDelete } from '@/api/admin'
 
 export default {
   name: 'AdminList',
@@ -92,6 +94,7 @@ export default {
       listLoading: true,
       showCreate: false,
       showUpdate: false,
+      showDelete: false,
       listQuery: {
         page: 1,
         limit: 10
@@ -161,6 +164,19 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    handleDelete(row) {
+      adminDelete(row).then(response => {
+        if (response) {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        }
+      })
+    },
     getRoleAll() {
       adminRoleAll({}).then(response => {
         // console.log(response)
@@ -223,6 +239,9 @@ export default {
       }
       if (this.competence.indexOf('adminUpdate') > 0) {
         this.showUpdate = true
+      }
+      if (this.competence.indexOf('adminDelete') > 0) {
+        this.showDelete = true
       }
     }
   }

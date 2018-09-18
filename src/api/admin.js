@@ -31,3 +31,11 @@ export function adminCreate(query) {
     params: query
   })
 }
+
+export function adminDelete(query) {
+  return request({
+    url: '/admin/adminDelete',
+    method: 'post',
+    params: query
+  })
+}
