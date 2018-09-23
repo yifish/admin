@@ -86,6 +86,15 @@ export const asyncRouterMap = [
           title: 'adminList',
           roles: 'adminList' // or you can only set roles in sub nav
         }
+      },
+      {
+        path: 'roleList',
+        component: () => import('@/views/role/index'),
+        name: 'RoleList',
+        meta: {
+          title: 'roleList',
+          roles: 'roleList' // or you can only set roles in sub nav
+        }
       }
     ]
   }
