@@ -48,16 +48,22 @@
 
         <el-form-item :label="$t('table.competenceList')">
           <el-tree
+            ref="competenceList"
             :data="competenceList"
             :accordion="true"
             :props="defaultProps"
-            :default-checked-keys="checkedCompetenceList"
             :default-expand-all="true"
             node-key="enName"
             show-checkbox
             @check-change="handleCheckChange"
           />
         </el-form-item>
+
+        <div class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">{{ $t('table.cancel') }}</el-button>
+          <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">{{ $t('table.confirm') }}</el-button>
+          <el-button v-else type="primary" @click="updateData">{{ $t('table.confirm') }}</el-button>
+        </div>
 
       </el-form>
 
@@ -68,7 +74,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { roleList, getCompetenceList } from '@/api/role'
+import { roleList, getCompetenceList, roleCreate, roleUpdate } from '@/api/role'
 
 export default {
   name: 'RoleList',
@@ -90,6 +96,7 @@ export default {
       newList: [],
       competenceList: [],
       checkedCompetenceList: [],
+      checkedCompetenceTemp: [],
       defaultProps: {
         children: 'competence',
         label: 'name'
@@ -162,12 +169,39 @@ export default {
         }
       }
     },
-    handleCreate() { // 添加管理员
+    handleCreate() { // 添加角色
       this.resetTemp()
       this.dialogStatus = 'create'
       this.dialogFormVisible = true
       this.$nextTick(() => {
+        this.$refs.competenceList.setCheckedKeys([], false)
         this.$refs['dataForm'].clearValidate()
+      })
+    },
+    handleUpdate(row) { // 修改角色
+      this.temp = Object.assign({}, row)
+      this.checkedCompetenceList = []
+      this.checkedCompetenceTemp = []
+      this.showCheckedCompetence(this.competenceList, this.temp.competence.split(','))
+      this.dialogStatus = 'update'
+      this.dialogFormVisible = true
+      this.$nextTick(() => {
+        this.$refs.competenceList.setCheckedKeys(this.checkedCompetenceTemp, true)
+        this.$refs['dataForm'].clearValidate()
+      })
+    },
+    // 初始化权限栏
+    showCheckedCompetence(competenceList, competence) {
+      competenceList.map(value => {
+        if (competence.indexOf(value.enName) >= 0) {
+          if (!value.competence) {
+            this.checkedCompetenceTemp.push(value.enName)
+          }
+          this.checkedCompetenceList.push(value.enName)
+        }
+        if (value.competence && value.competence.length > 0) {
+          this.showCheckedCompetence(value.competence, competence)
+        }
       })
     },
     // 显示权限的方法
@@ -176,9 +210,61 @@ export default {
       if (this.competence.indexOf('roleCreate') > 0) {
         this.showCreate = true
       }
+      if (this.competence.indexOf('roleUpdate') > 0) {
+        this.showUpdate = true
+      }
+    },
+    // 添加角色方法
+    createData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          tempData.competence = this.checkedCompetenceList.join(',')
+          roleCreate(tempData).then(response => {
+            if (response) {
+              this.getList()
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '添加成功',
+                type: 'success',
+                duration: 2000
+              })
+            }
+          })
+        }
+      })
+    },
+    // 修改角色
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.temp)
+          roleUpdate(tempData).then(response => {
+            if (response) {
+              for (const v of this.list) {
+                if (v.adminId === this.temp.adminId) {
+                  const index = this.list.indexOf(v)
+                  const tempData = Object.assign({}, this.temp)
+                  this.list.splice(index, 1, tempData)
+                  break
+                }
+              }
+              this.dialogFormVisible = false
+              this.$notify({
+                title: '成功',
+                message: '更新成功',
+                type: 'success',
+                duration: 2000
+              })
+            }
+          })
+        }
+      })
     },
     // 重置编辑对象
     resetTemp() {
+      this.checkedCompetenceList = []
       this.temp.roleId = undefined
       this.temp.competence = ''
       this.temp.name = ''
@@ -186,3 +272,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .dialog-footer{
+    text-align: right;
+  }
+</style>
