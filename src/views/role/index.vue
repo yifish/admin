@@ -74,7 +74,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { roleList, getCompetenceList, roleCreate, roleUpdate } from '@/api/role'
+import { roleList, getCompetenceList, roleCreate, roleUpdate, roleDelete } from '@/api/role'
 
 export default {
   name: 'RoleList',
@@ -190,6 +190,20 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
+    handleDelete(row) { // 删除角色
+      this.temp = Object.assign({}, row)
+      roleDelete(this.temp).then(response => {
+        if (response) {
+          this.getList()
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+          })
+        }
+      })
+    },
     // 初始化权限栏
     showCheckedCompetence(competenceList, competence) {
       competenceList.map(value => {
@@ -212,6 +226,9 @@ export default {
       }
       if (this.competence.indexOf('roleUpdate') > 0) {
         this.showUpdate = true
+      }
+      if (this.competence.indexOf('roleDelete') > 0) {
+        this.showDelete = true
       }
     },
     // 添加角色方法
@@ -239,6 +256,7 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          this.temp.competence = this.checkedCompetenceList.join(',')
           const tempData = Object.assign({}, this.temp)
           roleUpdate(tempData).then(response => {
             if (response) {

@@ -31,3 +31,11 @@ export function roleUpdate(query) {
     params: query
   })
 }
+
+export function roleDelete(query) {
+  return request({
+    url: '/admin/roleDelete',
+    method: 'post',
+    params: query
+  })
+}
