@@ -65,7 +65,7 @@
         <el-form-item :label="$t('table.name')" prop="name">
           <el-input v-model="temp.name"/>
         </el-form-item>
-        <el-form-item v-if="dialogStatus=='create'" :label="$t('table.password')" prop="password">
+        <el-form-item :label="$t('table.password')" prop="password">
           <el-input v-model="temp.password"/>
         </el-form-item>
         <el-form-item :label="$t('table.role')" prop="type">
@@ -112,7 +112,7 @@ export default {
         name: '',
         roleId: undefined,
         loginName: undefined,
-        password: undefined
+        password: ''
       },
       textMap: {
         update: this.$t('table.edit'),
@@ -170,7 +170,7 @@ export default {
       this.temp.name = ''
       this.temp.roleId = undefined
       this.temp.loginName = undefined
-      this.temp.password = undefined
+      this.temp.password = ''
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row)
@@ -202,7 +202,7 @@ export default {
     updateData() { // 修改管理员信息
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          // console.log(this.temp)
+          this.temp.password = ''
           const tempData = Object.assign({}, this.temp)
           adminUpdate(tempData).then(response => {
             // console.log(response)

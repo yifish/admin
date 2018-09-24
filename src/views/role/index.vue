@@ -186,7 +186,7 @@ export default {
       this.dialogStatus = 'update'
       this.dialogFormVisible = true
       this.$nextTick(() => {
-        this.$refs.competenceList.setCheckedKeys(this.checkedCompetenceTemp, true)
+        this.$refs.competenceList.setCheckedKeys(this.checkedCompetenceTemp)
         this.$refs['dataForm'].clearValidate()
       })
     },
@@ -207,8 +207,8 @@ export default {
     // 初始化权限栏
     showCheckedCompetence(competenceList, competence) {
       competenceList.map(value => {
-        if (competence.indexOf(value.enName) >= 0) {
-          if (!value.competence) {
+        if (competence.indexOf(value.enName) >= 0 || competence.indexOf('*') >= 0) {
+          if (!value.competence || competence.indexOf('*') >= 0) {
             this.checkedCompetenceTemp.push(value.enName)
           }
           this.checkedCompetenceList.push(value.enName)
