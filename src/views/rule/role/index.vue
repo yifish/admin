@@ -62,9 +62,12 @@
         </el-form-item>
         <el-form-item label="角色权限">
           <el-tree
-            ref="roleFree"
+            v-if="isRoleTree"
+            ref="roleTree"
             :data="menuList"
             show-checkbox
+            node-key="id"
+            :default-expanded-keys="roleTreeDefaultExpanded"
             @check-change="changeRoleTree"
           />
         </el-form-item>
@@ -79,13 +82,14 @@
 </template>
 
 <script>
-import { roleList, menuAll, addRole } from '@/api/admin'
+import { roleList, menuAll, addRole, updateRole } from '@/api/admin'
 
 export default {
   name: 'Role',
   data() {
     return {
       listLoading: false,
+      isRoleTree: false,
       showForm: false,
       list: [],
       menuAll: [],
@@ -124,7 +128,8 @@ export default {
           slot: true
         }
       ],
-      modelRoleTree: []
+      modelRoleTree: [],
+      roleTreeDefaultExpanded: []
     }
   },
   created() {
@@ -144,7 +149,7 @@ export default {
       })
     },
     editData(row, index, formType) {
-      this.initMenuList()
+      this.initMenuList(row)
       this.formType = formType
       this.showForm = true
       this.dataIndex = index
@@ -167,13 +172,29 @@ export default {
       this.getListData()
     },
     editRole() {
-      // updateAdmin(this.value).then((res) => {
-      //   if (res) {
-      //     this.$message.success('修改成功')
-      //     this.cancel()
-      //     this.getListData()
-      //   }
-      // })
+      const param = JSON.parse(JSON.stringify(this.value))
+      const roleTree = []
+      this.menuList.forEach((value, index, array) => {
+        let isMenu = false
+        value.children.forEach((v, i, arr) => {
+          if (this.modelRoleTree.indexOf(v.id) !== -1) {
+            roleTree.push(v.id)
+            isMenu = true
+          }
+        })
+        if (isMenu) {
+          roleTree.push(value.id)
+        }
+      })
+      param.action_name = roleTree.join(',')
+      updateRole(param).then((res) => {
+        if (res) {
+          this.$message.success('修改成功')
+          this.cancel()
+          this.form.page = 1
+          this.getListData()
+        }
+      })
     },
     addRole() {
       const param = JSON.parse(JSON.stringify(this.value))
@@ -215,7 +236,17 @@ export default {
       this.showForm = false
     },
     // 初始化权限菜单
-    initMenuList() {
+    initMenuList(row) {
+      this.isRoleTree = false
+      // 默认选中
+      const roleTreeDefaultCheck = []
+      this.roleTreeDefaultExpanded = []
+      let actionName = ''
+      if (row !== null) {
+        actionName = row.action_name
+      }
+      actionName = actionName.split(',')
+      this.modelRoleTree = actionName
       this.menuList.splice(0, this.menuList.length)
       const routes = this.$router.options.routes
       routes.forEach((value, index, array) => {
@@ -236,10 +267,21 @@ export default {
                 }
                 menu.children.push(children)
               }
+              if (actionName.includes(val.name)) {
+                roleTreeDefaultCheck.push(val.name)
+                this.roleTreeDefaultExpanded.push(val.name)
+              }
             })
             this.menuList.push(menu)
           }
         }
+      })
+      this.isRoleTree = true
+      this.setTreeKeys('roleTree', roleTreeDefaultCheck, true)
+    },
+    setTreeKeys(tree, list, bool) {
+      this.$nextTick(() => {
+        this.$refs[tree].setCheckedKeys(list, bool)
       })
     },
     // role树形选择事件

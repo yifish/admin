@@ -84,3 +84,11 @@ export function addRole(post) {
     data: post
   })
 }
+// 修改角色
+export function updateRole(post) {
+  return request({
+    url: '/admin/update-role',
+    method: 'post',
+    data: post
+  })
+}
