@@ -63,7 +63,7 @@ export const constantRoutes = [
     path: '/rule',
     component: Layout,
     name: 'rule',
-    meta: { title: '权限管理', icon: 'rule' },
+    meta: { title: '管理员管理', icon: 'rule' },
     children: [
       {
         path: '/rule/admin',
