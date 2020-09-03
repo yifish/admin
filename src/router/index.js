@@ -58,7 +58,6 @@ export const constantRoutes = [
       meta: { title: '主页', icon: 'home' }
     }]
   },
-
   {
     path: '/rule',
     component: Layout,
@@ -85,7 +84,20 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/advert',
+    component: Layout,
+    name: 'advert',
+    meta: { title: '活动广告', icon: 'advert' },
+    children: [
+      {
+        path: '/advert/swipe',
+        name: 'swipe',
+        component: () => import('@/views/advert/swipe/index'),
+        meta: { title: '轮播图', icon: 'swipe' }
+      }
+    ]
+  },
   {
     path: '/form',
     component: Layout,
